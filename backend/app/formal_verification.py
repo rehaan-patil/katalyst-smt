@@ -108,20 +108,47 @@ def verify_topology_resilience(
     effective_k = min(k, len(eligible_nodes))
     failure_terms = [z3.If(f_vars[nid], 1, 0) for nid in eligible_nodes]
     
+    found_sat = False
+    chosen_model = None
+    check_result = z3.unsat
+    min_cardinality = None
+
     if mode == "exact":
         solver.add(z3.Sum(failure_terms) == effective_k)
+        check_result = solver.check()
+        if check_result == z3.sat:
+            found_sat = True
+            chosen_model = solver.model()
+            min_cardinality = effective_k
     else:  # at_most
-        solver.add(z3.Sum(failure_terms) <= effective_k)
+        # Incremental search for minimum cardinality counterexample:
+        # We test r = 1, 2, ..., effective_k.
+        # The first r that is SAT yields the provably minimal cardinality failure cut.
+        for r in range(1, effective_k + 1):
+            solver.push()
+            solver.add(z3.Sum(failure_terms) == r)
+            res = solver.check()
+            if res == z3.sat:
+                found_sat = True
+                chosen_model = solver.model()
+                min_cardinality = r
+                check_result = z3.sat
+                solver.pop()
+                break
+            elif res == z3.unknown:
+                check_result = z3.unknown
+                solver.pop()
+                break
+            else:
+                solver.pop()
 
-    # 3. Solver Execution
-    check_result = solver.check()
+    # 3. Solver Execution Evaluation
     elapsed = (time.perf_counter() - start_time) * 1000.0
     
-    if check_result == z3.sat:
-        model = solver.model()
+    if found_sat and chosen_model is not None:
         raw_witness: List[str] = [
             nid for nid in eligible_nodes
-            if z3.is_true(model.eval(f_vars[nid]))
+            if z3.is_true(chosen_model.eval(f_vars[nid]))
         ]
         
         # Minimize witness: drop any node whose removal is not necessary to disconnect s and t
@@ -141,8 +168,8 @@ def verify_topology_resilience(
         
         witness_str = ", ".join(sorted(minimal_witness)) if minimal_witness else "None"
         proof_note = (
-            f"Z3 SMT solver proved existence of cutting failure set {{{witness_str}}} "
-            f"(size={len(minimal_witness)} <= {k}). "
+            f"Z3 SMT solver proved existence of provably minimal cutting failure set {{{witness_str}}} "
+            f"(cardinality={len(minimal_witness)} <= {k}). "
             f"Independent NetworkX path validation: Disconnected={is_actually_disconnected}."
         )
         

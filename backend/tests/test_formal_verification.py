@@ -172,3 +172,35 @@ def test_exhaustive_combinatorial_cross_validation():
     else:
         assert res.status == "UNSAT"
         assert res.is_resilient is True
+
+def test_minimal_cardinality_counterexample_guarantee():
+    """
+    Verifies that when multiple cuts of different sizes exist,
+    the solver in 'at_most' mode strictly returns the MINIMUM cardinality cut.
+    Here, {spof} is a 1-node cut, while {p1, p2} is a 2-node cut.
+    With failure_k=3, the engine must return the 1-node cut [spof].
+    """
+    nodes = [
+        TopologyNode(id="s"),
+        TopologyNode(id="p1"),
+        TopologyNode(id="p2"),
+        TopologyNode(id="spof"),
+        TopologyNode(id="t")
+    ]
+    edges = [
+        # s -> p1 -> spof -> t
+        TopologyEdge(source="s", target="p1"),
+        TopologyEdge(source="p1", target="spof"),
+        # s -> p2 -> spof -> t
+        TopologyEdge(source="s", target="p2"),
+        TopologyEdge(source="p2", target="spof"),
+        TopologyEdge(source="spof", target="t")
+    ]
+    top = Topology(nodes=nodes, edges=edges, source_node_id="s", sink_node_id="t")
+    
+    res = verify_topology_resilience(top, AnalysisConfig(failure_k=3, failure_mode="at_most"))
+    assert res.status == "SAT"
+    assert res.is_resilient is False
+    assert len(res.counterexample_nodes) == 1
+    assert res.counterexample_nodes == ["spof"]
+

@@ -11,6 +11,7 @@ import {
 } from "@xyflow/react";
 import { AppHeader } from "@/components/AppHeader";
 import { AppSidebar } from "@/components/AppSidebar";
+import { ResultStrip } from "@/components/ResultStrip";
 import { TopologyCanvas } from "@/components/TopologyCanvas";
 import { NodeInspector } from "@/components/NodeInspector";
 import { MathTelemetryPanel } from "@/components/MathTelemetryPanel";
@@ -422,50 +423,60 @@ export default function WorkspacePage() {
         />
 
         {/* Central Canvas */}
-        <main className="flex-1 relative h-full">
-          <TopologyCanvas
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            criticalCutEdges={analysisResult?.flow.critical_cut_edges || []}
-            vulnerableNodeIds={analysisResult?.verification.counterexample_nodes || []}
-            sourceNodeId={sourceNodeId}
-            sinkNodeId={sinkNodeId}
-          />
-
-          {/* Node Properties Drawer */}
-          <NodeInspector
-            node={selectedNode}
-            isSource={selectedNode?.id === sourceNodeId}
-            isSink={selectedNode?.id === sinkNodeId}
-            onClose={() => setSelectedNode(null)}
-            onUpdate={handleUpdateNode}
-            onSetSource={(id) => {
-              setSourceNodeId(id);
-              setSuccessToast(`Source set to '${id}'`);
-            }}
-            onSetSink={(id) => {
-              setSinkNodeId(id);
-              setSuccessToast(`Sink set to '${id}'`);
-            }}
-            onDelete={handleDeleteNode}
-          />
-
-          {/* Bottom Command Dock */}
-          <CommandDock
+        <main className="flex-1 flex flex-col relative h-full overflow-hidden">
+          <ResultStrip
+            nodeCount={nodes.length}
+            edgeCount={edges.length}
+            data={analysisResult}
+            isLoading={isAnalyzing}
             failureK={failureK}
-            onFailureKChange={setFailureK}
-            failureMode={failureMode}
-            onFailureModeChange={setFailureMode}
-            onAnalyze={handleAnalyze}
-            onSuggestRepairs={handleSuggestRepairs}
-            isAnalyzing={isAnalyzing}
-            isRepairing={isRepairing}
-            hasVulnerability={analysisResult?.verification.status === "SAT"}
           />
+
+          <div className="flex-1 relative w-full h-full">
+            <TopologyCanvas
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onNodeClick={onNodeClick}
+              criticalCutEdges={analysisResult?.flow.critical_cut_edges || []}
+              vulnerableNodeIds={analysisResult?.verification.counterexample_nodes || []}
+              sourceNodeId={sourceNodeId}
+              sinkNodeId={sinkNodeId}
+            />
+
+            {/* Node Properties Drawer */}
+            <NodeInspector
+              node={selectedNode}
+              isSource={selectedNode?.id === sourceNodeId}
+              isSink={selectedNode?.id === sinkNodeId}
+              onClose={() => setSelectedNode(null)}
+              onUpdate={handleUpdateNode}
+              onSetSource={(id) => {
+                setSourceNodeId(id);
+                setSuccessToast(`Source set to '${id}'`);
+              }}
+              onSetSink={(id) => {
+                setSinkNodeId(id);
+                setSuccessToast(`Sink set to '${id}'`);
+              }}
+              onDelete={handleDeleteNode}
+            />
+
+            {/* Bottom Command Dock */}
+            <CommandDock
+              failureK={failureK}
+              onFailureKChange={setFailureK}
+              failureMode={failureMode}
+              onFailureModeChange={setFailureMode}
+              onAnalyze={handleAnalyze}
+              onSuggestRepairs={handleSuggestRepairs}
+              isAnalyzing={isAnalyzing}
+              isRepairing={isRepairing}
+              hasVulnerability={analysisResult?.verification.status === "SAT"}
+            />
+          </div>
         </main>
 
         {/* Right Math Telemetry Panel */}

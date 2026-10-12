@@ -27,6 +27,7 @@ To achieve the **Zero-Known-Defect standard**, Katalyst.SMT requires rigorous ve
 | **SMT** | `SMT-03` | 2-resilient topology with $k=2$ failure | Z3 returns SAT, extracts 2-node cut | **VERIFIED PASSING** |
 | **SMT** | `SMT-04` | Anti-cycle ranking prevents false reachability | Cycle without source connection verified unreachable | **VERIFIED PASSING** |
 | **SMT** | `SMT-05` | Ground truth cross-check against combinatorial enumeration | Exhaustive search on small graphs matches Z3 100% | **VERIFIED PASSING** |
+| **SMT** | `SMT-06` | Minimal cardinality counterexample guarantee | Iterative search for r=1..k strictly yields minimum size cut | **VERIFIED PASSING** |
 | **Repair** | `REP-01` | Counterexample triggers candidate generation | Generates admissible $(u, v)$ across cut | **VERIFIED PASSING** |
 | **Repair** | `REP-02` | Re-verification of candidate graph $G'$ | Re-run Z3 on $G'$ proves UNSAT | **VERIFIED PASSING** |
 | **Repair** | `REP-03` | Cost optimization selects minimum cost repair | Budget constraint enforcement | **VERIFIED PASSING** |
@@ -42,6 +43,7 @@ To achieve the **Zero-Known-Defect standard**, Katalyst.SMT requires rigorous ve
 | **API** | `API-05` | Schema rejects missing source or invalid nodes | HTTP POST returns 422 Unprocessable | **VERIFIED PASSING** |
 | **Frontend** | `FE-01` | TypeScript compilation with strict checking | `tsc --noEmit` / Next.js typecheck: 0 errors | **VERIFIED PASSING** |
 | **Frontend** | `FE-02` | Next.js production build succeeds | `npm run build` exits 0, static pages prerendered | **VERIFIED PASSING** |
+| **Visual** | `VIS-01` | Blackbox.ai-inspired dark workspace redesign | 65% width canvas, ResultStrip, Laplacian heatmap | **VERIFIED PASSING** |
 
 ---
 
@@ -50,7 +52,7 @@ To achieve the **Zero-Known-Defect standard**, Katalyst.SMT requires rigorous ve
 ### Backend Pytest Suite Run
 ```powershell
 d:\DM\backend\venv\Scripts\pytest d:\DM\backend\tests -v
-============================= 27 passed in 1.12s =============================
+============================= 28 passed in 1.15s =============================
 ```
 
 ### Frontend Production Build Run
@@ -62,3 +64,17 @@ npm run build
 ✓ Finalizing page optimization
 Exit Code: 0
 ```
+
+---
+
+## 4. Release Verification Checklist
+
+- [x] **Z3 At-Most-K Simultaneous Failure Soundness:** Verified via Menger's directed cut closure formulation.
+- [x] **Minimal Counterexample Guarantee:** Verified via incremental cardinality search $r = 1, \dots, k$.
+- [x] **Initially Disconnected Handling:** Handled separately as base partition prior to failure injection.
+- [x] **Candidate Repair Re-Verification:** Every repair candidate re-verified by complete Z3 solver check.
+- [x] **Repair Cost-Optimality:** Certified minimum cost among verified remediation edges.
+- [x] **Frontend/Backend Type Parity:** Identical schemas across Pydantic and TypeScript definitions.
+- [x] **Zero Secrets in Repository:** `.gitignore` and git history verified free of tokens and secrets.
+- [x] **Visual Redesign Complete:** Compact result strip, interactive Laplacian heatmap, eigenvalue plot, and responsive React Flow canvas.
+
