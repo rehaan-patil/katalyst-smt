@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: katalyst-smt-backend
+    runtime: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: "https://frontend-wine-three-55.vercel.app,http://localhost:3000,*"
+      - key: MAX_NODES
+        value: "150"
+      - key: MAX_EDGES
+        value: "600"
+      - key: MAX_K_FAILURE
+        value: "5"
+      - key: SOLVER_TIMEOUT_MS
+        value: "5000"
