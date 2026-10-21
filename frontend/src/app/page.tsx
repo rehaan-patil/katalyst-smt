@@ -184,8 +184,8 @@ export default function WorkspacePage() {
       ]);
       setSuccessToast(
         res.verification.status === "UNSAT"
-          ? `Verified! System resilient to ${failureK} node failure(s).`
-          : `Counterexample found: ${res.verification.counterexample_nodes.join(", ") || "cut partition"}`
+          ? `Verified! Architecture is resilient to ${failureK} simultaneous outage(s).`
+          : `Vulnerability found: Outage in ${res.verification.counterexample_nodes.join(", ") || "critical bottleneck"} disrupts traffic.`
       );
     } catch (err: any) {
       setErrorMessage(err.detail || err.message || "Failed to execute analysis.");
@@ -374,7 +374,7 @@ export default function WorkspacePage() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#07090E] text-slate-100 overflow-hidden select-none font-sans">
+    <div className="flex flex-col h-screen w-screen bg-white text-slate-900 overflow-hidden select-none font-sans">
       {/* Hidden File Input for Import */}
       <input
         type="file"
@@ -395,12 +395,12 @@ export default function WorkspacePage() {
 
       {/* Toasts & Error Banners */}
       {errorMessage && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900/95 border border-rose-500/40 text-slate-200 text-xs flex items-center space-x-2.5 shadow-2xl shadow-rose-950/40 backdrop-blur-md animate-fade-in">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-white border border-rose-300 text-rose-900 text-xs flex items-center space-x-2.5 shadow-lg shadow-rose-900/5 animate-fade-in">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           <span className="font-medium">{errorMessage}</span>
           <button
             onClick={() => setErrorMessage(null)}
-            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -408,12 +408,12 @@ export default function WorkspacePage() {
       )}
 
       {successToast && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900/95 border border-emerald-500/40 text-slate-200 text-xs flex items-center space-x-2.5 shadow-2xl shadow-emerald-950/40 backdrop-blur-md animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 text-xs flex items-center space-x-2.5 shadow-lg shadow-emerald-900/5 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span className="font-medium">{successToast}</span>
           <button
             onClick={() => setSuccessToast(null)}
-            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>

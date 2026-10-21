@@ -8,11 +8,8 @@ import {
   ArrowRightCircle,
   ArrowLeftCircle,
   Cpu,
-  Layers,
   Activity,
   Zap,
-  Sliders,
-  AlertTriangle,
 } from "lucide-react";
 
 interface NodeInspectorProps {
@@ -41,86 +38,78 @@ export function NodeInspector({
   const failurePercent = ((node.failure_prob ?? 0.01) * 100).toFixed(1);
 
   return (
-    <div className="absolute top-4 right-4 w-80 rounded-xl bg-slate-950/90 backdrop-blur-xl border border-slate-800/80 shadow-2xl shadow-black/80 z-30 flex flex-col overflow-hidden animate-fade-in text-slate-200">
+    <div className="absolute top-4 right-4 w-80 rounded-xl bg-white border border-slate-200 shadow-xl z-30 flex flex-col overflow-hidden animate-fade-in text-slate-800 select-none">
       {/* Header */}
-      <div className="px-4 py-3 bg-gradient-to-r from-slate-900/90 to-slate-950/90 border-b border-slate-800/80 flex items-center justify-between">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-7 h-7 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
+      <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
             <Cpu className="w-3.5 h-3.5" />
           </div>
           <div>
-            <div className="flex items-center space-x-1.5">
-              <span className="text-xs font-semibold tracking-tight text-white">
-                Node Inspector
-              </span>
-              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/50">
-                v1.2
-              </span>
-            </div>
-            <p className="text-[10px] text-slate-500 font-mono">
-              Config & Telemetry Attributes
-            </p>
+            <span className="text-xs font-semibold text-slate-900 block">
+              Service Settings
+            </span>
+            <span className="text-[10px] text-slate-500 font-mono">
+              id: {node.id}
+            </span>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
-          title="Close Inspector"
+          className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          title="Close Settings"
         >
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* Body */}
-      <div className="p-4 space-y-4 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar">
+      <div className="p-4 space-y-3.5 max-h-[calc(100vh-220px)] overflow-y-auto">
         {/* Node Identifier */}
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-400 flex items-center space-x-1">
-              <span>Vertex Identifier</span>
-            </label>
-            <span className="text-[9px] font-mono text-slate-500">Immutable</span>
-          </div>
-          <div className="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-white font-mono text-xs select-all flex items-center justify-between">
-            <span className="font-bold text-slate-200">{node.id}</span>
+          <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 block mb-1">
+            Service ID
+          </label>
+          <div className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 font-mono text-xs select-all flex items-center justify-between">
+            <span className="font-semibold">{node.id}</span>
             <div className="flex items-center space-x-1">
               {isSource && (
-                <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] font-semibold">
-                  SRC
+                <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 text-[9px] font-bold">
+                  SOURCE
                 </span>
               )}
               {isSink && (
-                <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-[9px] font-semibold">
-                  SNK
+                <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                  SINK
                 </span>
               )}
             </div>
           </div>
         </div>
 
-        {/* Node Display Name / Label */}
+        {/* Display Label */}
         <div>
-          <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-400 block mb-1.5">
-            Service Label
+          <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 block mb-1">
+            Display Label
           </label>
           <input
             type="text"
             value={node.label || ""}
             onChange={(e) => onUpdate({ ...node, label: e.target.value })}
-            placeholder="e.g. Ingress Gateway"
-            className="w-full px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-100 text-xs placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-all"
+            placeholder="e.g. Primary Ingress"
+            className="w-full px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 text-xs placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 transition-colors"
           />
         </div>
 
         {/* Capacity */}
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-400 flex items-center space-x-1">
-              <Zap className="w-3 h-3 text-brand-400" />
-              <span>Throughput Capacity</span>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 flex items-center space-x-1">
+              <Zap className="w-3 h-3 text-blue-600" />
+              <span>Throughput Limit</span>
             </label>
-            <span className="text-[10px] font-mono text-brand-400">
-              {node.capacity ? `${node.capacity} req/s` : "Unbounded"}
+            <span className="text-[10px] text-blue-600 font-medium">
+              {node.capacity ? `${node.capacity} req/s` : "Unlimited"}
             </span>
           </div>
           <div className="relative">
@@ -128,7 +117,7 @@ export function NodeInspector({
               type="number"
               min="0"
               step="5"
-              placeholder="Unlimited capacity"
+              placeholder="Leave blank for unlimited"
               value={node.capacity ?? ""}
               onChange={(e) =>
                 onUpdate({
@@ -136,22 +125,22 @@ export function NodeInspector({
                   capacity: e.target.value ? parseFloat(e.target.value) : undefined,
                 })
               }
-              className="w-full pl-3 pr-14 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-100 font-mono text-xs focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-all"
+              className="w-full pl-3 pr-14 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:bg-white focus:outline-none focus:border-blue-500 transition-colors"
             />
-            <span className="absolute right-3 top-1.5 text-[10px] font-mono text-slate-500 pointer-events-none">
+            <span className="absolute right-3 top-1.5 text-[10px] text-slate-400 pointer-events-none">
               req/s
             </span>
           </div>
         </div>
 
         {/* Failure Probability Slider */}
-        <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800/80 space-y-2">
+        <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-300 flex items-center space-x-1">
-              <Activity className="w-3 h-3 text-rose-400" />
-              <span>Failure Probability (p)</span>
+            <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-600 flex items-center space-x-1">
+              <Activity className="w-3 h-3 text-rose-500" />
+              <span>Outage Probability</span>
             </label>
-            <span className="text-xs font-mono font-bold text-rose-400">
+            <span className="text-xs font-bold text-rose-600 font-mono">
               {failurePercent}%
             </span>
           </div>
@@ -168,20 +157,20 @@ export function NodeInspector({
                 failure_prob: parseFloat(e.target.value) || 0.0,
               })
             }
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-500"
+            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
           />
 
-          <div className="flex justify-between text-[9px] font-mono text-slate-500">
-            <span>0% (Resilient)</span>
+          <div className="flex justify-between text-[10px] text-slate-400">
+            <span>0% (Never Fails)</span>
             <span>10%</span>
             <span>20% (High Risk)</span>
           </div>
         </div>
 
-        {/* Terminal Roles (Source / Sink) */}
+        {/* Roles (Source / Sink) */}
         <div className="space-y-1.5">
-          <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-400 block">
-            Topological Boundary
+          <label className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 block">
+            Traffic Boundary
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -189,14 +178,14 @@ export function NodeInspector({
               disabled={isSource}
               className={`py-2 px-2.5 rounded-lg text-xs font-medium border transition-all flex items-center justify-center space-x-1.5 ${
                 isSource
-                  ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40 cursor-default shadow-sm shadow-emerald-500/20"
-                  : "bg-slate-900/80 hover:bg-slate-850 hover:border-slate-700 border-slate-800 text-slate-300"
+                  ? "bg-blue-50 text-blue-700 border-blue-300 font-semibold cursor-default"
+                  : "bg-white hover:bg-slate-50 border-slate-200 text-slate-700"
               }`}
             >
               <ArrowRightCircle
-                className={`w-3.5 h-3.5 ${isSource ? "text-emerald-400" : "text-slate-400"}`}
+                className={`w-3.5 h-3.5 ${isSource ? "text-blue-600" : "text-slate-400"}`}
               />
-              <span className="text-[11px]">{isSource ? "Active Source" : "Set Source"}</span>
+              <span className="text-[11px]">{isSource ? "Is Source" : "Set as Source"}</span>
             </button>
 
             <button
@@ -204,31 +193,31 @@ export function NodeInspector({
               disabled={isSink}
               className={`py-2 px-2.5 rounded-lg text-xs font-medium border transition-all flex items-center justify-center space-x-1.5 ${
                 isSink
-                  ? "bg-cyan-500/15 text-cyan-300 border-cyan-500/40 cursor-default shadow-sm shadow-cyan-500/20"
-                  : "bg-slate-900/80 hover:bg-slate-850 hover:border-slate-700 border-slate-800 text-slate-300"
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-300 font-semibold cursor-default"
+                  : "bg-white hover:bg-slate-50 border-slate-200 text-slate-700"
               }`}
             >
               <ArrowLeftCircle
-                className={`w-3.5 h-3.5 ${isSink ? "text-cyan-400" : "text-slate-400"}`}
+                className={`w-3.5 h-3.5 ${isSink ? "text-emerald-600" : "text-slate-400"}`}
               />
-              <span className="text-[11px]">{isSink ? "Active Sink" : "Set Sink"}</span>
+              <span className="text-[11px]">{isSink ? "Is Sink" : "Set as Sink"}</span>
             </button>
           </div>
         </div>
 
-        {/* Danger Zone: Delete Node */}
-        <div className="pt-2 border-t border-slate-800/80">
+        {/* Delete Action */}
+        <div className="pt-2 border-t border-slate-200">
           <button
             onClick={() => onDelete(node.id)}
             disabled={isSource || isSink}
             className={`w-full py-2 px-3 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center space-x-1.5 ${
               isSource || isSink
-                ? "bg-slate-900/50 text-slate-600 border border-slate-800 cursor-not-allowed"
-                : "bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:border-rose-500/40"
+                ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                : "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200"
             }`}
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>{isSource || isSink ? "Terminals Cannot Be Deleted" : "Decommission Node"}</span>
+            <span>{isSource || isSink ? "Terminals Cannot Be Deleted" : "Remove Service"}</span>
           </button>
         </div>
       </div>

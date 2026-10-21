@@ -4,13 +4,11 @@ import React, { memo } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
 import {
   ShieldAlert,
-  Server,
   Database,
   Globe,
   Layers,
   Cpu,
-  Activity,
-  Zap,
+  AlertTriangle,
 } from "lucide-react";
 
 export interface NodeData {
@@ -35,37 +33,33 @@ function CustomTopologyNodeComponent({ data, selected }: NodeProps) {
   const getTierConfig = () => {
     if (isSource || tier.includes("ingress") || tier.includes("gateway")) {
       return {
-        icon: <Globe className="w-3.5 h-3.5 text-emerald-400" />,
-        accent: "from-emerald-500/20 to-teal-500/5",
-        bar: "bg-emerald-400",
-        badge: "INGRESS",
-        badgeClass: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+        icon: <Globe className="w-3.5 h-3.5 text-blue-600" />,
+        accent: "bg-blue-600",
+        badge: "GATEWAY",
+        badgeClass: "bg-blue-50 text-blue-700 border-blue-200",
       };
     }
     if (isSink || tier.includes("db") || tier.includes("storage") || tier.includes("data")) {
       return {
-        icon: <Database className="w-3.5 h-3.5 text-cyan-400" />,
-        accent: "from-cyan-500/20 to-blue-500/5",
-        bar: "bg-cyan-400",
-        badge: "PERSISTENCE",
-        badgeClass: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+        icon: <Database className="w-3.5 h-3.5 text-emerald-600" />,
+        accent: "bg-emerald-600",
+        badge: "DATABASE",
+        badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
       };
     }
     if (tier.includes("cache") || tier.includes("queue") || tier.includes("broker")) {
       return {
-        icon: <Layers className="w-3.5 h-3.5 text-amber-400" />,
-        accent: "from-amber-500/20 to-orange-500/5",
-        bar: "bg-amber-400",
-        badge: "QUEUE / CACHE",
-        badgeClass: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+        icon: <Layers className="w-3.5 h-3.5 text-amber-600" />,
+        accent: "bg-amber-500",
+        badge: "CACHE",
+        badgeClass: "bg-amber-50 text-amber-700 border-amber-200",
       };
     }
     return {
-      icon: <Cpu className="w-3.5 h-3.5 text-indigo-400" />,
-      accent: "from-indigo-500/20 to-violet-500/5",
-      bar: "bg-indigo-400",
+      icon: <Cpu className="w-3.5 h-3.5 text-indigo-600" />,
+      accent: "bg-indigo-600",
       badge: "SERVICE",
-      badgeClass: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30",
+      badgeClass: "bg-indigo-50 text-indigo-700 border-indigo-200",
     };
   };
 
@@ -75,48 +69,48 @@ function CustomTopologyNodeComponent({ data, selected }: NodeProps) {
 
   return (
     <div
-      className={`relative w-[190px] rounded-xl overflow-hidden backdrop-blur-md transition-all duration-300 select-none shadow-lg ${
+      className={`relative w-[200px] rounded-xl overflow-hidden bg-white select-none transition-all duration-200 ${
         isVulnerable
-          ? "bg-rose-950/40 border-2 border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.35)] ring-1 ring-rose-500/50"
+          ? "border-2 border-rose-500 shadow-md ring-2 ring-rose-400/20"
           : selected
-          ? "bg-slate-900/90 border-2 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.3)] ring-1 ring-indigo-500/40"
-          : "bg-[#0E131F]/90 border border-white/[0.09] hover:border-white/20 hover:shadow-xl hover:-translate-y-0.5"
+          ? "border-2 border-blue-600 shadow-md ring-2 ring-blue-500/20"
+          : "border border-slate-200 shadow-sm hover:border-slate-300 hover:shadow"
       }`}
     >
-      {/* Top Accent Gradient Bar */}
-      <div className={`h-1 w-full ${isVulnerable ? "bg-rose-500 animate-pulse" : config.bar}`} />
+      {/* Top Accent Strip */}
+      <div className={`h-1 w-full ${isVulnerable ? "bg-rose-500" : config.accent}`} />
 
       {/* Target Connection Handle (Top) */}
       {!isSource && (
         <Handle
           type="target"
           position={Position.Top}
-          className="!bg-indigo-500 !w-2.5 !h-2.5 !border-2 !border-[#07090E] !-top-1.5 transition-transform hover:!scale-150"
+          className="!bg-blue-600 !w-2.5 !h-2.5 !border-2 !border-white !-top-1.5 transition-transform hover:!scale-125 !shadow-sm"
         />
       )}
 
-      {/* Card Body */}
+      {/* Card Content */}
       <div className="p-3">
-        {/* Header Row */}
-        <div className="flex items-center justify-between mb-1.5">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-1">
           <div className="flex items-center space-x-2 min-w-0">
-            <div className="p-1 rounded-md bg-white/[0.04] border border-white/[0.06] shrink-0">
+            <div className="p-1 rounded-md bg-slate-50 border border-slate-100 shrink-0">
               {config.icon}
             </div>
-            <span className="font-sans font-semibold text-xs text-white tracking-tight truncate">
+            <span className="font-semibold text-xs text-slate-900 truncate">
               {nodeData.label || nodeData.id}
             </span>
           </div>
 
           {/* Status Badge */}
           {isVulnerable ? (
-            <span className="flex items-center space-x-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500 text-white shadow-sm shrink-0 animate-pulse">
+            <span className="flex items-center space-x-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200 shrink-0">
               <ShieldAlert className="w-2.5 h-2.5" />
-              <span>SPOF</span>
+              <span>At Risk</span>
             </span>
           ) : (
             <span
-              className={`text-[8.5px] font-mono font-medium px-1.5 py-0.5 rounded border shrink-0 ${config.badgeClass}`}
+              className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border shrink-0 ${config.badgeClass}`}
             >
               {config.badge}
             </span>
@@ -124,26 +118,24 @@ function CustomTopologyNodeComponent({ data, selected }: NodeProps) {
         </div>
 
         {/* Node Identifier */}
-        <div className="font-mono text-[10px] text-slate-400 mb-2 truncate px-0.5">
-          {nodeData.id}
+        <div className="font-mono text-[10px] text-slate-400 mb-2 truncate">
+          id: {nodeData.id}
         </div>
 
-        {/* Metrics Grid */}
-        <div className="pt-2 border-t border-white/[0.06] space-y-1.5 font-mono text-[10px]">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[9px] text-slate-500 uppercase">Throughput</span>
-            <span className="text-slate-200 font-medium">
-              {nodeData.capacity ? `${nodeData.capacity} req/s` : "Unbounded"}
+        {/* Specs Table */}
+        <div className="pt-2 border-t border-slate-100 space-y-1 text-[11px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span>Capacity</span>
+            <span className="font-medium text-slate-800">
+              {nodeData.capacity ? `${nodeData.capacity} req/s` : "Unlimited"}
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[9px] text-slate-500 uppercase">Fail Prior P(f)</span>
+          <div className="flex items-center justify-between text-slate-500">
+            <span>Failure Risk</span>
             <span
-              className={`text-[9.5px] font-medium px-1 rounded ${
-                failureProb > 0.015
-                  ? "text-rose-400 bg-rose-500/10"
-                  : "text-emerald-400 bg-emerald-500/10"
+              className={`font-medium ${
+                failureProb > 0.015 ? "text-rose-600 font-semibold" : "text-emerald-600"
               }`}
             >
               {(failureProb * 100).toFixed(1)}%
@@ -157,7 +149,7 @@ function CustomTopologyNodeComponent({ data, selected }: NodeProps) {
         <Handle
           type="source"
           position={Position.Bottom}
-          className="!bg-cyan-400 !w-2.5 !h-2.5 !border-2 !border-[#07090E] !-bottom-1.5 transition-transform hover:!scale-150"
+          className="!bg-blue-600 !w-2.5 !h-2.5 !border-2 !border-white !-bottom-1.5 transition-transform hover:!scale-125 !shadow-sm"
         />
       )}
     </div>
@@ -165,4 +157,3 @@ function CustomTopologyNodeComponent({ data, selected }: NodeProps) {
 }
 
 export const CustomTopologyNode = memo(CustomTopologyNodeComponent);
-

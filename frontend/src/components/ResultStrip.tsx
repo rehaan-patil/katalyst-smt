@@ -2,7 +2,15 @@
 
 import React from "react";
 import { AnalyzeTopologyResponse } from "@/lib/types";
-import { ShieldCheck, ShieldAlert, Cpu, Activity, Zap, CheckCircle2, AlertTriangle, Clock } from "lucide-react";
+import {
+  ShieldCheck,
+  ShieldAlert,
+  Clock,
+  Sparkles,
+  Loader2,
+  TrendingUp,
+  Activity,
+} from "lucide-react";
 
 interface ResultStripProps {
   nodeCount: number;
@@ -37,43 +45,44 @@ export function ResultStrip({
     .join(" ");
 
   return (
-    <div className="h-11 border-b border-white/[0.08] bg-[#0A0E17]/95 backdrop-blur-md px-5 flex items-center justify-between text-xs select-none z-20 shrink-0">
-      {/* Left Metrics */}
-      <div className="flex items-center space-x-3.5">
-        {/* Topology Cardinality */}
-        <div className="flex items-center space-x-1.5 font-mono text-[11px] text-slate-300">
-          <span className="text-[10px] font-sans font-semibold text-slate-400 uppercase tracking-wider">Mesh</span>
-          <span className="font-semibold text-white">|V|={nodeCount}</span>
-          <span className="text-slate-600">/</span>
-          <span className="font-semibold text-white">|E|={edgeCount}</span>
-        </div>
-
-        <div className="h-3.5 w-px bg-white/[0.08]" />
-
-        {/* Fiedler Value & Spectrum Sparkline */}
+    <div className="h-11 border-b border-slate-200 bg-white px-5 flex items-center justify-between text-xs select-none z-20 shrink-0">
+      {/* Left: Key Network Metrics */}
+      <div className="flex items-center space-x-4">
+        {/* Connectivity Score */}
         <div className="flex items-center space-x-2">
           <span
-            className="text-[10px] font-sans font-semibold text-slate-400 uppercase tracking-wider"
-            title="Algebraic Connectivity (2nd smallest Laplacian eigenvalue)"
+            className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide"
+            title="Algebraic connectivity of the network graph"
           >
-            Fiedler λ₂
+            Connectivity Strength
           </span>
           {fiedler !== null ? (
             <div className="flex items-center space-x-2">
+              <span className="font-semibold text-slate-900">
+                {fiedler.toFixed(2)}
+              </span>
               <span
-                className={`font-mono text-xs font-bold ${
-                  fiedler > 0.001 ? "text-indigo-300" : "text-amber-400"
+                className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                  fiedler > 0.5
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : fiedler > 0.05
+                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    : "bg-amber-50 text-amber-700 border border-amber-200"
                 }`}
               >
-                {fiedler.toFixed(3)}
+                {fiedler > 0.5 ? "High Redundancy" : fiedler > 0.05 ? "Normal" : "Fragile"}
               </span>
+
               {eigenvalues.length > 1 && (
-                <div className="bg-slate-900/80 px-1 py-0.5 rounded border border-white/[0.06] flex items-center" title="Eigenvalue Spectrum">
-                  <svg className="w-13 h-3.5 overflow-visible" viewBox="0 0 52 14" fill="none">
+                <div
+                  className="bg-slate-50 px-1 py-0.5 rounded border border-slate-200 flex items-center"
+                  title="Eigenvalue spectrum distribution"
+                >
+                  <svg className="w-12 h-3.5 overflow-visible" viewBox="0 0 52 14" fill="none">
                     <polyline
                       fill="none"
-                      stroke="#818CF8"
-                      strokeWidth="1.8"
+                      stroke="#3B82F6"
+                      strokeWidth="1.75"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       points={sparklinePoints}
@@ -82,8 +91,8 @@ export function ResultStrip({
                       <circle
                         cx={(1 / (eigenvalues.length - 1)) * 52}
                         cy={14 - (eigenvalues[1] / maxEigen) * 12}
-                        r="2.2"
-                        fill="#6366F1"
+                        r="2"
+                        fill="#2563EB"
                       />
                     )}
                   </svg>
@@ -91,86 +100,82 @@ export function ResultStrip({
               )}
             </div>
           ) : (
-            <span className="font-mono text-slate-600">—</span>
+            <span className="text-slate-400">—</span>
           )}
         </div>
 
-        <div className="h-3.5 w-px bg-white/[0.08]" />
+        <div className="h-4 w-px bg-slate-200" />
 
-        {/* Max Flow & Min-Cut Capacity */}
+        {/* Max Throughput */}
         <div className="flex items-center space-x-2">
-          <span className="text-[10px] font-sans font-semibold text-slate-400 uppercase tracking-wider">Flow / Cut</span>
-          {maxFlow !== null && minCut !== null ? (
-            <div className="flex items-center space-x-1.5 font-mono text-[11px]">
-              <span className="text-cyan-400 font-semibold">{maxFlow.toFixed(1)}</span>
-              <span className="text-slate-600">/</span>
-              <span className="text-cyan-400 font-semibold">{minCut.toFixed(1)}</span>
-              <span
-                className="text-[9px] font-sans font-semibold px-1.5 py-0.5 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 rounded-full"
-                title="Max-Flow Min-Cut Strong Duality Formally Verified"
-              >
-                DUAL VERIFIED
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+            Max Throughput
+          </span>
+          {maxFlow !== null ? (
+            <div className="flex items-center space-x-1.5">
+              <span className="font-semibold text-slate-900">
+                {maxFlow.toFixed(1)} req/s
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded font-medium">
+                Verified
               </span>
             </div>
           ) : (
-            <span className="font-mono text-slate-600">—</span>
+            <span className="text-slate-400">—</span>
           )}
         </div>
       </div>
 
-      {/* Right: Formal SMT Verification Status */}
+      {/* Right: Verification Status */}
       <div className="flex items-center space-x-3">
         {isLoading ? (
-          <div className="flex items-center space-x-2 text-indigo-400 animate-pulse bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20">
-            <Cpu className="w-3.5 h-3.5 animate-spin" />
-            <span className="font-mono text-[11px] font-semibold tracking-wide">
-              SOLVING Z3 SMT CONSTRAINTS...
-            </span>
+          <div className="flex items-center space-x-2 text-blue-600 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <span className="text-xs font-medium">Testing network resilience...</span>
           </div>
         ) : verification ? (
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center space-x-2">
             {verification.status === "UNSAT" ? (
-              <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-200 shadow-sm">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-sans font-bold text-xs tracking-tight">
-                  CERTIFIED RESILIENT (k={failureK})
+              <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="font-semibold text-xs">
+                  Resilient against {failureK} simultaneous outage{failureK > 1 ? "s" : ""}
                 </span>
-                <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold">
-                  UNSAT
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                  PASSED
                 </span>
               </div>
             ) : verification.status === "SAT" ? (
-              <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-200 shadow-sm">
-                <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
-                <span className="font-sans font-bold text-xs tracking-tight">
-                  VULNERABILITY DETECTED: {verification.counterexample_nodes.length} SPOF
+              <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-800">
+                <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                <span className="font-semibold text-xs">
+                  Vulnerability Found: {verification.counterexample_nodes.join(", ") || "Cut failure"} breaks traffic
                 </span>
-                <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-bold">
-                  SAT
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">
+                  FAILED
                 </span>
               </div>
             ) : (
-              <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-200 shadow-sm">
-                <Activity className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="font-sans font-bold text-xs tracking-tight">SOLVER TIMEOUT (UNKNOWN)</span>
+              <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800">
+                <Activity className="w-4 h-4 text-amber-600 shrink-0" />
+                <span className="font-semibold text-xs">Simulation Inconclusive</span>
               </div>
             )}
 
             {duration !== null && (
-              <div className="flex items-center space-x-1 text-[10.5px] font-mono text-slate-400 bg-slate-900/60 px-2 py-1 rounded border border-white/[0.06]">
-                <Clock className="w-3 h-3 text-slate-500" />
-                <span>{duration.toFixed(1)}ms</span>
+              <div className="flex items-center space-x-1 text-[11px] text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-200">
+                <Clock className="w-3 h-3 text-slate-400" />
+                <span>{duration.toFixed(0)} ms</span>
               </div>
             )}
           </div>
         ) : (
-          <div className="flex items-center space-x-2 text-slate-400 text-xs font-sans">
-            <span className="w-2 h-2 rounded-full bg-slate-600 inline-block" />
-            <span>SMT Ready · Awaiting Verification Run</span>
+          <div className="flex items-center space-x-2 text-slate-500 text-xs">
+            <span className="w-2 h-2 rounded-full bg-slate-300 inline-block" />
+            <span>Ready · Click &quot;Test Resilience&quot; below to evaluate</span>
           </div>
         )}
       </div>
     </div>
   );
 }
-

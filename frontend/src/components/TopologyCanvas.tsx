@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   ReactFlow,
   Background,
@@ -61,7 +61,7 @@ export function TopologyCanvas({
     });
   }, [nodes, vulnerableNodeIds, sourceNodeId, sinkNodeId]);
 
-  // Format edges with enterprise highlighting
+  // Format edges with clean highlighting
   const decoratedEdges = useMemo(() => {
     const cutEdgeSet = new Set(
       criticalCutEdges.map((e) => `${e.source}->${e.target}`)
@@ -72,10 +72,10 @@ export function TopologyCanvas({
       const isRepair = edge.id?.startsWith("repair-");
 
       const edgeColor = isCut
-        ? "#F43F5E" // Rose-500 for critical cut bottlenecks
+        ? "#E11D48" // Rose-600 for bottlenecks
         : isRepair
-        ? "#818CF8" // Brand indigo for synthesized repair
-        : "#334155"; // Slate-700 for nominal pipeline
+        ? "#2563EB" // Blue-600 for synthesized repair link
+        : "#94A3B8"; // Slate-400 for standard link
 
       return {
         ...edge,
@@ -88,16 +88,15 @@ export function TopologyCanvas({
         },
         style: {
           stroke: edgeColor,
-          strokeWidth: isCut ? 2.75 : isRepair ? 2.25 : 1.5,
+          strokeWidth: isCut ? 2.5 : isRepair ? 2.2 : 1.5,
           strokeDasharray: isRepair ? "4 4" : undefined,
-          filter: isCut ? "drop-shadow(0 0 4px rgba(244,63,94,0.4))" : undefined,
         },
       };
     });
   }, [edges, criticalCutEdges]);
 
   return (
-    <div className="w-full h-full bg-[#07090E] relative overflow-hidden select-none">
+    <div className="w-full h-full bg-slate-50 relative overflow-hidden select-none">
       <ReactFlow
         nodes={decoratedNodes}
         edges={decoratedEdges}
@@ -114,17 +113,17 @@ export function TopologyCanvas({
           type: "smoothstep",
         }}
       >
-        <Background color="#1e293b" gap={24} size={1.25} />
-        <Controls className="!bg-slate-900/90 !border !border-slate-800 !text-slate-300 !rounded-lg !shadow-xl !shadow-black/70" />
+        <Background color="#CBD5E1" gap={24} size={1.2} />
+        <Controls className="!bg-white !border !border-slate-200 !text-slate-700 !rounded-xl !shadow-md" />
         <MiniMap
           nodeColor={(n) => {
-            if (n.id === sourceNodeId) return "#10B981";
-            if (n.id === sinkNodeId) return "#06B6D4";
-            if (vulnerableNodeIds.includes(n.id)) return "#F43F5E";
-            return "#334155";
+            if (n.id === sourceNodeId) return "#2563EB";
+            if (n.id === sinkNodeId) return "#059669";
+            if (vulnerableNodeIds.includes(n.id)) return "#E11D48";
+            return "#CBD5E1";
           }}
-          maskColor="rgba(7, 9, 14, 0.75)"
-          className="!bg-slate-950/90 !border !border-slate-800 !rounded-lg !shadow-xl !shadow-black/70"
+          maskColor="rgba(241, 245, 249, 0.75)"
+          className="!bg-white !border !border-slate-200 !rounded-xl !shadow-md"
         />
       </ReactFlow>
     </div>

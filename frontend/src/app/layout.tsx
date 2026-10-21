@@ -15,9 +15,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Katalyst.SMT — Enterprise Infrastructure Resilience & Formal Verification Platform",
+  title: "Katalyst — Network Resilience Studio",
   description:
-    "Enterprise-grade infrastructure resilience SaaS powered by Z3 SMT theorem proving, spectral graph theory, and Counterexample-Guided Proof-to-Repair synthesis.",
+    "Interactive infrastructure resilience testing and automated architecture remediation powered by formal mathematical verification.",
 };
 
 export default function RootLayout({
@@ -26,11 +26,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark h-full ${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="h-full bg-[#07090E] text-slate-100 font-sans antialiased selection:bg-indigo-600/30 selection:text-indigo-200">
+    <html lang="en" className={`h-full ${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="h-full bg-white text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
         {children}
       </body>
     </html>
   );
 }
-
