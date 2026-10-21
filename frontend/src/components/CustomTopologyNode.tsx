@@ -2,7 +2,16 @@
 
 import React, { memo } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
-import { ShieldAlert, ArrowDownRight, Server, Database, Globe } from "lucide-react";
+import {
+  ShieldAlert,
+  Server,
+  Database,
+  Globe,
+  Layers,
+  Cpu,
+  Activity,
+  Zap,
+} from "lucide-react";
 
 export interface NodeData {
   id: string;
@@ -20,81 +29,135 @@ function CustomTopologyNodeComponent({ data, selected }: NodeProps) {
   const isSource = nodeData.isSource;
   const isSink = nodeData.isSink;
   const isVulnerable = nodeData.isVulnerable;
+  const tier = (nodeData.tier || "").toLowerCase();
 
-  // Tier Icon
-  const getIcon = () => {
-    if (isSource) return <Globe className="w-3.5 h-3.5 text-emerald-400" />;
-    if (isSink) return <Database className="w-3.5 h-3.5 text-cyan-400" />;
-    return <Server className="w-3.5 h-3.5 text-gray-400" />;
+  // Tier Visual Configuration
+  const getTierConfig = () => {
+    if (isSource || tier.includes("ingress") || tier.includes("gateway")) {
+      return {
+        icon: <Globe className="w-3.5 h-3.5 text-emerald-400" />,
+        accent: "from-emerald-500/20 to-teal-500/5",
+        bar: "bg-emerald-400",
+        badge: "INGRESS",
+        badgeClass: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+      };
+    }
+    if (isSink || tier.includes("db") || tier.includes("storage") || tier.includes("data")) {
+      return {
+        icon: <Database className="w-3.5 h-3.5 text-cyan-400" />,
+        accent: "from-cyan-500/20 to-blue-500/5",
+        bar: "bg-cyan-400",
+        badge: "PERSISTENCE",
+        badgeClass: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+      };
+    }
+    if (tier.includes("cache") || tier.includes("queue") || tier.includes("broker")) {
+      return {
+        icon: <Layers className="w-3.5 h-3.5 text-amber-400" />,
+        accent: "from-amber-500/20 to-orange-500/5",
+        bar: "bg-amber-400",
+        badge: "QUEUE / CACHE",
+        badgeClass: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+      };
+    }
+    return {
+      icon: <Cpu className="w-3.5 h-3.5 text-indigo-400" />,
+      accent: "from-indigo-500/20 to-violet-500/5",
+      bar: "bg-indigo-400",
+      badge: "SERVICE",
+      badgeClass: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30",
+    };
   };
+
+  const config = getTierConfig();
+  const capacity = nodeData.capacity ?? 50;
+  const failureProb = nodeData.failure_prob ?? 0.01;
 
   return (
     <div
-      className={`relative px-3 py-2.5 rounded-md min-w-[150px] transition-all duration-200 select-none ${
+      className={`relative w-[190px] rounded-xl overflow-hidden backdrop-blur-md transition-all duration-300 select-none shadow-lg ${
         isVulnerable
-          ? "bg-red-950/40 border-2 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]"
-          : isSource
-          ? "bg-emerald-950/30 border border-emerald-500/80 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
-          : isSink
-          ? "bg-cyan-950/30 border border-cyan-500/80 shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+          ? "bg-rose-950/40 border-2 border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.35)] ring-1 ring-rose-500/50"
           : selected
-          ? "bg-[#141414] border border-cyberViolet shadow-[0_0_10px_rgba(139,92,246,0.2)]"
-          : "bg-[#0A0A0A] border border-white/10 hover:border-white/20"
+          ? "bg-slate-900/90 border-2 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.3)] ring-1 ring-indigo-500/40"
+          : "bg-[#0E131F]/90 border border-white/[0.09] hover:border-white/20 hover:shadow-xl hover:-translate-y-0.5"
       }`}
     >
-      {/* Target Handle (Left/Top) */}
+      {/* Top Accent Gradient Bar */}
+      <div className={`h-1 w-full ${isVulnerable ? "bg-rose-500 animate-pulse" : config.bar}`} />
+
+      {/* Target Connection Handle (Top) */}
       {!isSource && (
         <Handle
           type="target"
           position={Position.Top}
-          className="!bg-cyberViolet !w-2 !h-2 !border !border-white"
+          className="!bg-indigo-500 !w-2.5 !h-2.5 !border-2 !border-[#07090E] !-top-1.5 transition-transform hover:!scale-150"
         />
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center space-x-1.5">
-          {getIcon()}
-          <span className="font-mono text-xs font-semibold text-white tracking-tight truncate max-w-[100px]">
-            {nodeData.label || nodeData.id}
-          </span>
+      {/* Card Body */}
+      <div className="p-3">
+        {/* Header Row */}
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center space-x-2 min-w-0">
+            <div className="p-1 rounded-md bg-white/[0.04] border border-white/[0.06] shrink-0">
+              {config.icon}
+            </div>
+            <span className="font-sans font-semibold text-xs text-white tracking-tight truncate">
+              {nodeData.label || nodeData.id}
+            </span>
+          </div>
+
+          {/* Status Badge */}
+          {isVulnerable ? (
+            <span className="flex items-center space-x-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500 text-white shadow-sm shrink-0 animate-pulse">
+              <ShieldAlert className="w-2.5 h-2.5" />
+              <span>SPOF</span>
+            </span>
+          ) : (
+            <span
+              className={`text-[8.5px] font-mono font-medium px-1.5 py-0.5 rounded border shrink-0 ${config.badgeClass}`}
+            >
+              {config.badge}
+            </span>
+          )}
         </div>
 
-        {isVulnerable && (
-          <span className="flex items-center space-x-1 text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-500 text-white animate-pulse">
-            <ShieldAlert className="w-2.5 h-2.5" />
-            <span>CUT</span>
-          </span>
-        )}
+        {/* Node Identifier */}
+        <div className="font-mono text-[10px] text-slate-400 mb-2 truncate px-0.5">
+          {nodeData.id}
+        </div>
 
-        {isSource && (
-          <span className="text-[9px] font-mono px-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            SRC
-          </span>
-        )}
+        {/* Metrics Grid */}
+        <div className="pt-2 border-t border-white/[0.06] space-y-1.5 font-mono text-[10px]">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-[9px] text-slate-500 uppercase">Throughput</span>
+            <span className="text-slate-200 font-medium">
+              {nodeData.capacity ? `${nodeData.capacity} req/s` : "Unbounded"}
+            </span>
+          </div>
 
-        {isSink && (
-          <span className="text-[9px] font-mono px-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-            SINK
-          </span>
-        )}
-      </div>
-
-      {/* Sub-label & Metadata */}
-      <div className="font-mono text-[10px] text-gray-400 space-y-0.5">
-        <div className="text-gray-500 truncate">{nodeData.id}</div>
-        <div className="flex justify-between text-[9px] text-gray-500 pt-1 border-t border-white/5">
-          <span>Cap: {nodeData.capacity ? `${nodeData.capacity}/s` : "∞"}</span>
-          <span>Fail: {((nodeData.failure_prob ?? 0.01) * 100).toFixed(1)}%</span>
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-[9px] text-slate-500 uppercase">Fail Prior P(f)</span>
+            <span
+              className={`text-[9.5px] font-medium px-1 rounded ${
+                failureProb > 0.015
+                  ? "text-rose-400 bg-rose-500/10"
+                  : "text-emerald-400 bg-emerald-500/10"
+              }`}
+            >
+              {(failureProb * 100).toFixed(1)}%
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Source Handle (Bottom) */}
+      {/* Source Connection Handle (Bottom) */}
       {!isSink && (
         <Handle
           type="source"
           position={Position.Bottom}
-          className="!bg-neonBlue !w-2 !h-2 !border !border-white"
+          className="!bg-cyan-400 !w-2.5 !h-2.5 !border-2 !border-[#07090E] !-bottom-1.5 transition-transform hover:!scale-150"
         />
       )}
     </div>
@@ -102,3 +165,4 @@ function CustomTopologyNodeComponent({ data, selected }: NodeProps) {
 }
 
 export const CustomTopologyNode = memo(CustomTopologyNodeComponent);
+

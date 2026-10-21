@@ -67,6 +67,14 @@ export default function WorkspacePage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-dismiss success toast
+  useEffect(() => {
+    if (successToast) {
+      const timer = setTimeout(() => setSuccessToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [successToast]);
+
   // Load a preset topology into React Flow nodes and edges
   const loadPreset = useCallback((preset: TopologyPreset) => {
     const top = preset.topology;
@@ -366,7 +374,7 @@ export default function WorkspacePage() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-black text-white overflow-hidden select-none">
+    <div className="flex flex-col h-screen w-screen bg-[#07090E] text-slate-100 overflow-hidden select-none font-sans">
       {/* Hidden File Input for Import */}
       <input
         type="file"
@@ -387,12 +395,12 @@ export default function WorkspacePage() {
 
       {/* Toasts & Error Banners */}
       {errorMessage && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-lg bg-red-950/90 border border-red-500/50 text-red-200 font-mono text-xs flex items-center space-x-2 shadow-2xl animate-fade-in">
-          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-          <span>{errorMessage}</span>
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900/95 border border-rose-500/40 text-slate-200 text-xs flex items-center space-x-2.5 shadow-2xl shadow-rose-950/40 backdrop-blur-md animate-fade-in">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span className="font-medium">{errorMessage}</span>
           <button
             onClick={() => setErrorMessage(null)}
-            className="p-1 hover:text-white"
+            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -400,12 +408,12 @@ export default function WorkspacePage() {
       )}
 
       {successToast && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-lg bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 font-mono text-xs flex items-center space-x-2 shadow-2xl animate-fade-in">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900/95 border border-emerald-500/40 text-slate-200 text-xs flex items-center space-x-2.5 shadow-2xl shadow-emerald-950/40 backdrop-blur-md animate-fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{successToast}</span>
+          <span className="font-medium">{successToast}</span>
           <button
             onClick={() => setSuccessToast(null)}
-            className="p-1 hover:text-white"
+            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>

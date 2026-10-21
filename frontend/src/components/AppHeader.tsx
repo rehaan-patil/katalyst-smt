@@ -2,7 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { checkBackendHealth } from "@/lib/api";
-import { Activity, ShieldCheck, Download, Upload, RefreshCw, Cpu } from "lucide-react";
+import {
+  Download,
+  Upload,
+  RotateCcw,
+  Network,
+  Shield,
+  Activity,
+  Layers,
+  Sparkles,
+} from "lucide-react";
 
 interface AppHeaderProps {
   nodeCount: number;
@@ -20,7 +29,8 @@ export function AppHeader({
   onReset,
 }: AppHeaderProps) {
   const [backendStatus, setBackendStatus] = useState<"checking" | "online" | "offline">("checking");
-  const [backendVersion, setBackendVersion] = useState<string>("");
+  const [backendVersion, setBackendVersion] = useState<string>("1.0.0");
+  const [z3Version, setZ3Version] = useState<string>("5.3.1");
 
   useEffect(() => {
     let mounted = true;
@@ -46,83 +56,103 @@ export function AppHeader({
   }, []);
 
   return (
-    <header className="h-14 border-b border-white/10 bg-black/90 backdrop-blur px-4 flex items-center justify-between z-20 select-none">
-      {/* Brand */}
-      <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 rounded bg-gradient-to-br from-cyberViolet to-neonBlue flex items-center justify-center font-mono font-bold text-black text-sm tracking-tighter shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-          K·S
+    <header className="h-14 border-b border-white/[0.08] bg-[#090D15]/90 backdrop-blur-xl px-5 flex items-center justify-between z-30 select-none">
+      {/* Brand Identity */}
+      <div className="flex items-center space-x-3.5">
+        <div className="relative group cursor-pointer">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-cyan-500 p-[1px] shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-transform group-hover:scale-105">
+            <div className="w-full h-full bg-[#0B0F17] rounded-[7px] flex items-center justify-center">
+              <Shield className="w-4 h-4 text-indigo-400 group-hover:text-cyan-300 transition-colors" />
+            </div>
+          </div>
+          <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-[#0B0F17]" />
         </div>
+
         <div>
           <div className="flex items-center space-x-2">
-            <span className="font-mono font-semibold tracking-wider text-sm text-white">
-              KATALYST<span className="text-cyberViolet">.SMT</span>
+            <span className="font-sans font-extrabold text-sm tracking-tight text-white">
+              KATALYST<span className="text-indigo-400">.SMT</span>
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-gray-400 font-mono">
-              v1.0.0
+            <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-medium">
+              v{backendVersion}
+            </span>
+            <span className="hidden lg:inline-flex text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.06] text-slate-400">
+              PROD-FABRIC
             </span>
           </div>
-          <p className="text-[10px] text-gray-500 font-mono hidden sm:block">
+          <p className="text-[10.5px] text-slate-400 font-sans hidden sm:block leading-none mt-0.5">
             Formally Verified Resilience & Proof-to-Repair Engine
           </p>
         </div>
       </div>
 
-      {/* Center Metrics */}
-      <div className="hidden md:flex items-center space-x-4 font-mono text-xs text-gray-400">
-        <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-panel border border-white/10">
-          <Cpu className="w-3.5 h-3.5 text-cyberViolet" />
-          <span>Nodes: <strong className="text-white">{nodeCount}</strong></span>
-          <span className="text-gray-600">|</span>
-          <span>Edges: <strong className="text-white">{edgeCount}</strong></span>
+      {/* Center Metrics & Engine Telemetry */}
+      <div className="hidden md:flex items-center space-x-3 text-xs">
+        {/* Topology Cardinality */}
+        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-white/[0.08] text-slate-300 shadow-sm">
+          <Network className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="flex items-center space-x-1.5 font-mono text-[11px]">
+            <span className="text-slate-400">Nodes:</span>
+            <span className="text-white font-semibold">{nodeCount}</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-slate-400">Edges:</span>
+            <span className="text-white font-semibold">{edgeCount}</span>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2 px-2.5 py-1 rounded bg-panel border border-white/10">
+        {/* Solver Engine Live Status */}
+        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-white/[0.08] shadow-sm">
           <span
-            className={`w-2 h-2 rounded-full ${
+            className={`w-2 h-2 rounded-full transition-all ${
               backendStatus === "online"
-                ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                ? "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)] animate-pulse"
                 : backendStatus === "offline"
-                ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
-                : "bg-yellow-500 animate-pulse"
+                ? "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]"
+                : "bg-amber-400 animate-ping"
             }`}
           />
-          <span className="text-[11px]">
-            API:{" "}
-            <strong className={backendStatus === "online" ? "text-emerald-400" : "text-gray-400"}>
-              {backendStatus.toUpperCase()}
-            </strong>
-          </span>
+          <div className="flex items-center space-x-1 font-mono text-[11px]">
+            <span className="text-slate-400">Z3 SMT:</span>
+            <span
+              className={`font-semibold ${
+                backendStatus === "online" ? "text-emerald-400" : "text-rose-400"
+              }`}
+            >
+              {backendStatus === "online" ? "VERIFIED ONLINE" : "OFFLINE"}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Controls */}
       <div className="flex items-center space-x-2">
         <button
           onClick={onImportClick}
-          className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded text-xs font-mono text-gray-300 hover:text-white bg-panel hover:bg-white/5 border border-white/10 transition-colors"
-          title="Import JSON Topology"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-sans font-medium text-slate-300 hover:text-white bg-slate-900/80 hover:bg-slate-800/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-sm"
+          title="Import Topology Definition (JSON)"
         >
-          <Upload className="w-3.5 h-3.5" />
+          <Upload className="w-3.5 h-3.5 text-slate-400" />
           <span className="hidden sm:inline">Import</span>
         </button>
 
         <button
           onClick={onExport}
-          className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded text-xs font-mono text-gray-300 hover:text-white bg-panel hover:bg-white/5 border border-white/10 transition-colors"
-          title="Export JSON Topology"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-sans font-medium text-slate-300 hover:text-white bg-slate-900/80 hover:bg-slate-800/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-sm"
+          title="Export Topology Definition (JSON)"
         >
-          <Download className="w-3.5 h-3.5" />
+          <Download className="w-3.5 h-3.5 text-slate-400" />
           <span className="hidden sm:inline">Export</span>
         </button>
 
         <button
           onClick={onReset}
-          className="p-1.5 rounded text-gray-400 hover:text-white bg-panel hover:bg-white/5 border border-white/10 transition-colors"
-          title="Reset Topology"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900/80 hover:bg-slate-800/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-sm"
+          title="Reset Canvas to Default Preset"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
+          <RotateCcw className="w-3.5 h-3.5" />
         </button>
       </div>
     </header>
   );
 }
+

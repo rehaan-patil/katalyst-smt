@@ -1,10 +1,23 @@
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Katalyst.SMT — Infrastructure Resilience & Formal Verification",
+  title: "Katalyst.SMT — Enterprise Infrastructure Resilience & Formal Verification Platform",
   description:
-    "Mathematically rigorous infrastructure resilience SaaS with Z3 SMT formal verification and the Proof-to-Repair remediation engine.",
+    "Enterprise-grade infrastructure resilience SaaS powered by Z3 SMT theorem proving, spectral graph theory, and Counterexample-Guided Proof-to-Repair synthesis.",
 };
 
 export default function RootLayout({
@@ -13,10 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark h-full">
-      <body className="h-full bg-black text-gray-100 font-sans antialiased selection:bg-purple-900 selection:text-white">
+    <html lang="en" className={`dark h-full ${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="h-full bg-[#07090E] text-slate-100 font-sans antialiased selection:bg-indigo-600/30 selection:text-indigo-200">
         {children}
       </body>
     </html>
   );
 }
+

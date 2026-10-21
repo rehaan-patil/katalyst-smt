@@ -9,9 +9,6 @@ import {
   Node,
   Edge,
   Connection,
-  addEdge,
-  useNodesState,
-  useEdgesState,
   MarkerType,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -64,7 +61,7 @@ export function TopologyCanvas({
     });
   }, [nodes, vulnerableNodeIds, sourceNodeId, sinkNodeId]);
 
-  // Format edges with highlighting
+  // Format edges with enterprise highlighting
   const decoratedEdges = useMemo(() => {
     const cutEdgeSet = new Set(
       criticalCutEdges.map((e) => `${e.source}->${e.target}`)
@@ -74,6 +71,12 @@ export function TopologyCanvas({
       const isCut = cutEdgeSet.has(`${edge.source}->${edge.target}`);
       const isRepair = edge.id?.startsWith("repair-");
 
+      const edgeColor = isCut
+        ? "#F43F5E" // Rose-500 for critical cut bottlenecks
+        : isRepair
+        ? "#818CF8" // Brand indigo for synthesized repair
+        : "#334155"; // Slate-700 for nominal pipeline
+
       return {
         ...edge,
         animated: isCut || isRepair,
@@ -81,19 +84,20 @@ export function TopologyCanvas({
           type: MarkerType.ArrowClosed,
           width: 14,
           height: 14,
-          color: isCut ? "#EF4444" : isRepair ? "#8B5CF6" : "#60A5FA",
+          color: edgeColor,
         },
         style: {
-          stroke: isCut ? "#EF4444" : isRepair ? "#8B5CF6" : "#404040",
-          strokeWidth: isCut ? 3 : isRepair ? 2.5 : 1.5,
-          strokeDasharray: isRepair ? "5 5" : undefined,
+          stroke: edgeColor,
+          strokeWidth: isCut ? 2.75 : isRepair ? 2.25 : 1.5,
+          strokeDasharray: isRepair ? "4 4" : undefined,
+          filter: isCut ? "drop-shadow(0 0 4px rgba(244,63,94,0.4))" : undefined,
         },
       };
     });
   }, [edges, criticalCutEdges]);
 
   return (
-    <div className="w-full h-full bg-black relative">
+    <div className="w-full h-full bg-[#07090E] relative overflow-hidden select-none">
       <ReactFlow
         nodes={decoratedNodes}
         edges={decoratedEdges}
@@ -103,24 +107,24 @@ export function TopologyCanvas({
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.3 }}
+        fitViewOptions={{ padding: 0.25 }}
         minZoom={0.2}
         maxZoom={2.0}
         defaultEdgeOptions={{
           type: "smoothstep",
         }}
       >
-        <Background color="#222222" gap={20} size={1} />
-        <Controls className="!bg-panel !border-white/10" />
+        <Background color="#1e293b" gap={24} size={1.25} />
+        <Controls className="!bg-slate-900/90 !border !border-slate-800 !text-slate-300 !rounded-lg !shadow-xl !shadow-black/70" />
         <MiniMap
           nodeColor={(n) => {
             if (n.id === sourceNodeId) return "#10B981";
             if (n.id === sinkNodeId) return "#06B6D4";
-            if (vulnerableNodeIds.includes(n.id)) return "#EF4444";
-            return "#404040";
+            if (vulnerableNodeIds.includes(n.id)) return "#F43F5E";
+            return "#334155";
           }}
-          maskColor="rgba(0, 0, 0, 0.7)"
-          className="!bg-panel !border-white/10 rounded-md"
+          maskColor="rgba(7, 9, 14, 0.75)"
+          className="!bg-slate-950/90 !border !border-slate-800 !rounded-lg !shadow-xl !shadow-black/70"
         />
       </ReactFlow>
     </div>

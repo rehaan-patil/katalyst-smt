@@ -3,73 +3,132 @@
 @tailwind utilities;
 
 :root {
-  --background: #000000;
-  --foreground: #f3f4f6;
+  --background: #07090E;
+  --foreground: #F1F5F9;
+  --surface-base: #0B0F17;
+  --surface-card: #111724;
+  --surface-elevated: #161E30;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(99, 102, 241, 0.35);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
+  letter-spacing: -0.01em;
 }
 
-/* Custom dark scrollbars */
+/* Custom dark sleek scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #262626;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #404040;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 /* React Flow customizations */
 .react-flow__background {
-  background-color: #000000 !important;
+  background-color: #07090E !important;
 }
 
 .react-flow__handle {
-  background-color: #8b5cf6 !important;
-  border: 1px solid #ffffff !important;
-  width: 8px !important;
-  height: 8px !important;
+  background-color: #6366F1 !important;
+  border: 2px solid #0B0F17 !important;
+  width: 10px !important;
+  height: 10px !important;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.35);
+  background-color: #818CF8 !important;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.9) !important;
 }
 
 .react-flow__edge-path {
-  stroke: #404040;
-  stroke-width: 2;
+  stroke: #334155;
+  stroke-width: 1.8;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: #818CF8;
+  stroke-width: 2.2;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #8b5cf6;
+  stroke: #6366F1;
   stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
 }
 
 .react-flow__controls {
-  background-color: #0a0a0a !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  background-color: rgba(13, 18, 29, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7) !important;
+  overflow: hidden;
 }
 
 .react-flow__controls-button {
-  background-color: #0a0a0a !important;
+  background-color: transparent !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  fill: #a3a3a3 !important;
+  fill: #94A3B8 !important;
+  transition: all 0.15s ease;
 }
 
 .react-flow__controls-button:hover {
-  background-color: #171717 !important;
-  fill: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  fill: #FFFFFF !important;
 }
+
+.react-flow__minimap {
+  background-color: rgba(11, 15, 23, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7) !important;
+  overflow: hidden;
+}
+
+/* Glassmorphic utilities */
+.glass-panel {
+  background: rgba(13, 18, 29, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card {
+  background: rgba(18, 24, 38, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-card-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  background: rgba(24, 32, 50, 0.8);
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(99, 102, 241, 0.15);
+}
+

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Play, Wrench, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
+import { Play, Wrench, ShieldCheck, ShieldAlert, Loader2, Sparkles, Sliders } from "lucide-react";
 
 interface CommandDockProps {
   failureK: number;
@@ -27,21 +27,25 @@ export function CommandDock({
   hasVulnerability,
 }: CommandDockProps) {
   return (
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 font-mono">
-      <div className="px-3 py-2 rounded-xl bg-panel/90 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] flex items-center space-x-3 text-xs">
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 select-none">
+      <div className="px-4 py-2.5 rounded-2xl bg-[#090D15]/95 backdrop-blur-2xl border border-white/[0.12] shadow-[0_12px_40px_rgba(0,0,0,0.8)] flex items-center space-x-3.5 text-xs ring-1 ring-white/[0.05]">
         {/* Failure parameter k selector */}
-        <div className="flex items-center space-x-2 px-2.5 py-1.5 rounded-lg bg-black border border-white/5">
-          <span className="text-gray-400 font-semibold text-[11px]">Failures (k):</span>
+        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-white/[0.07]">
+          <span className="text-slate-400 font-sans font-medium text-[11px] flex items-center space-x-1">
+            <Sliders className="w-3 h-3 text-indigo-400" />
+            <span>Tolerance (k):</span>
+          </span>
           <div className="flex items-center space-x-1">
             {[1, 2, 3, 4].map((kVal) => (
               <button
                 key={kVal}
                 onClick={() => onFailureKChange(kVal)}
-                className={`w-6 h-6 rounded flex items-center justify-center font-bold text-[11px] transition-colors ${
+                className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-bold text-[11px] transition-all ${
                   failureK === kVal
-                    ? "bg-cyberViolet text-white shadow-[0_0_8px_rgba(139,92,246,0.5)]"
-                    : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                    ? "bg-indigo-600 text-white shadow-[0_0_12px_rgba(99,102,241,0.6)] scale-105"
+                    : "text-slate-400 hover:text-white hover:bg-white/[0.06]"
                 }`}
+                title={`Test resilience against up to ${kVal} concurrent node failures`}
               >
                 {kVal}
               </button>
@@ -50,47 +54,49 @@ export function CommandDock({
         </div>
 
         {/* Mode Selector */}
-        <div className="flex items-center space-x-1 px-1 py-1 rounded-lg bg-black border border-white/5">
+        <div className="flex items-center space-x-1 p-1 rounded-xl bg-slate-900/90 border border-white/[0.07]">
           <button
             onClick={() => onFailureModeChange("at_most")}
-            className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-sans font-medium transition-all ${
               failureMode === "at_most"
-                ? "bg-white/10 text-white font-semibold"
-                : "text-gray-500 hover:text-gray-300"
+                ? "bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 shadow-sm"
+                : "text-slate-400 hover:text-slate-200"
             }`}
+            title="Failures ≤ k (at most k nodes fail)"
           >
-            ≤ k
+            ≤ k (At-Most)
           </button>
           <button
             onClick={() => onFailureModeChange("exact")}
-            className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-sans font-medium transition-all ${
               failureMode === "exact"
-                ? "bg-white/10 text-white font-semibold"
-                : "text-gray-500 hover:text-gray-300"
+                ? "bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 shadow-sm"
+                : "text-slate-400 hover:text-slate-200"
             }`}
+            title="Failures = k (exactly k nodes fail)"
           >
-            = k
+            = k (Exact)
           </button>
         </div>
 
-        {/* Vertical Divider */}
-        <div className="h-6 w-px bg-white/10" />
+        {/* Divider */}
+        <div className="h-6 w-px bg-white/[0.08]" />
 
         {/* Primary Analyze Button */}
         <button
           onClick={onAnalyze}
           disabled={isAnalyzing}
-          className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyberViolet to-neonBlue hover:from-cyberViolet-dark hover:to-neonBlue-dark text-white font-semibold text-xs tracking-wide transition-all shadow-[0_0_16px_rgba(139,92,246,0.3)] disabled:opacity-50"
+          className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white font-sans font-semibold text-xs tracking-wide transition-all shadow-[0_0_20px_rgba(99,102,241,0.4)] disabled:opacity-50 hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:scale-[1.02] active:scale-[0.98]"
         >
           {isAnalyzing ? (
             <>
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>Verifying with Z3...</span>
+              <span>Solving Constraints with Z3...</span>
             </>
           ) : (
             <>
               <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Analyze Topology</span>
+              <span>Verify Infrastructure Resilience</span>
             </>
           )}
         </button>
@@ -100,16 +106,16 @@ export function CommandDock({
           <button
             onClick={onSuggestRepairs}
             disabled={isRepairing}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-cyberViolet/20 hover:bg-cyberViolet/30 text-cyberViolet-light border border-cyberViolet/40 font-medium text-xs tracking-wide transition-all shadow-[0_0_12px_rgba(139,92,246,0.2)] animate-pulse"
+            className="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500/20 to-indigo-500/20 hover:from-rose-500/30 hover:to-indigo-500/30 text-rose-300 border border-rose-500/40 font-sans font-semibold text-xs tracking-wide transition-all shadow-[0_0_15px_rgba(244,63,94,0.3)] animate-pulse"
           >
             {isRepairing ? (
               <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
                 <span>Synthesizing...</span>
               </>
             ) : (
               <>
-                <Wrench className="w-3.5 h-3.5" />
+                <Wrench className="w-3.5 h-3.5 text-rose-400" />
                 <span>Synthesize Repairs</span>
               </>
             )}
@@ -119,3 +125,4 @@ export function CommandDock({
     </div>
   );
 }
+
